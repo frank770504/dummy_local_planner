@@ -6,6 +6,7 @@ project(dummy_local_planner)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   base_local_planner
+  cmake_modules
   costmap_2d
   dynamic_reconfigure
   nav_core
