@@ -87,8 +87,6 @@ namespace dummy_local_planner {
 
       base_local_planner::LocalPlannerUtil planner_util_;
 
-      boost::shared_ptr<DummyPlanner> dp_; ///< @brief The trajectory controller
-
       costmap_2d::Costmap2DROS* costmap_ros_;
 
       dynamic_reconfigure::Server<DummyPlannerConfig> *dsrv_;

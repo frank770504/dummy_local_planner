@@ -46,7 +46,6 @@ namespace dummy_local_planner {
       planner_util_.reconfigureCB(limits, config.restore_defaults);
 
       // update dummy specific configuration
-      dp_->reconfigure(config);
   }
 
   DummyPlannerROS::DummyPlannerROS() : initialized_(false),
@@ -71,9 +70,6 @@ namespace dummy_local_planner {
       costmap_2d::Costmap2D* costmap = costmap_ros_->getCostmap();
 
       planner_util_.initialize(tf, costmap, costmap_ros_->getGlobalFrameID());
-
-      //create the actual planner that we'll use.. it'll configure itself from the parameter server
-      dp_ = boost::shared_ptr<DummyPlanner>(new DummyPlanner(name, &planner_util_));
 
       if( private_nh.getParam( "odom_topic", odom_topic_ ))
       {
@@ -100,7 +96,7 @@ namespace dummy_local_planner {
     latchedStopRotateController_.resetLatching();
 
     ROS_INFO("Got new plan");
-    return dp_->setPlan(orig_global_plan);
+    return planner_util_.setPlan(orig_global_plan);
   }
 
   bool DummyPlannerROS::isGoalReached() {
@@ -153,9 +149,6 @@ namespace dummy_local_planner {
       return false;
     }
     ROS_DEBUG_NAMED("dummy_local_planner", "Received a transformed plan with %zu points.", transformed_plan.size());
-
-    // update plan in dummy_planner even if we just stop and rotate, to allow checkTrajectory
-    //dp_->updatePlanAndLocalCosts(current_pose_, transformed_plan);
 
     if (latchedStopRotateController_.isPositionReached(&planner_util_, current_pose_)) {
       //publish an empty plan because we've reached our goal position
