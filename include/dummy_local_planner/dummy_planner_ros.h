@@ -116,6 +116,12 @@ namespace dummy_local_planner {
       template <typename T> int sgn(T val) {
          return (T(0) < val) - (val < T(0));
       }
+      bool always_true(
+      Eigen::Vector3f pos,
+      Eigen::Vector3f vel,
+      Eigen::Vector3f vel_samples) {
+        return true;
+      }
   };  // end class DUMMYPlannerROS
 };  // end namespace dummy_local_planner
 

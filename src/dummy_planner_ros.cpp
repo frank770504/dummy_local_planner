@@ -241,25 +241,24 @@ namespace dummy_local_planner {
       publishGlobalPlan(transformed_plan);
       publishLocalPlan(local_plan);
       base_local_planner::LocalPlannerLimits limits = planner_util_.getCurrentLimits();
-      return true;
-      //~ return latchedStopRotateController_.computeVelocityCommandsStopRotate(
-          //~ cmd_vel,
-          //~ limits.getAccLimits(),
-          //~ dp_->getSimPeriod(),
-          //~ &planner_util_,
-          //~ odom_helper_,
-          //~ current_pose_,
-          //~ boost::bind(&DummyPlanner::checkTrajectory, dp_, _1, _2, _3));
+      return latchedStopRotateController_.computeVelocityCommandsStopRotate(
+          cmd_vel,
+          limits.getAccLimits(),
+          0.05,
+          &planner_util_,
+          odom_helper_,
+          current_pose_,
+          boost::bind(&DummyPlannerROS::always_true, this, _1, _2, _3));
     } else {
       //~ bool isOk = dummyComputeVelocityCommands(current_pose_, cmd_vel);
       geometry_msgs::PoseStamped goal_pose = transformed_plan.back();
       Eigen::Vector3f pos(current_pose_.getOrigin().getX(), current_pose_.getOrigin().getY(), tf::getYaw(current_pose_.getRotation()));
       double angle_to_goal = atan2(goal_pose.pose.position.y - pos[1], goal_pose.pose.position.x - pos[0]);
-      if ( fabs(angle_to_goal) >= 0.001 ) {
+      if ( fabs(pos[2] - angle_to_goal) >= (5*3.14159/180.0) ) {
         cmd_vel.linear.x = 0.0;
-        cmd_vel.angular.z = 0.1 * sgn<double>(angle_to_goal);
+        cmd_vel.angular.z = 0.1 * sgn<double>(angle_to_goal - pos[2]);
       } else {
-        cmd_vel.linear.x = 0;
+        cmd_vel.linear.x = 0.1;
         cmd_vel.angular.z = 0;
       }
       bool isOk = true;
