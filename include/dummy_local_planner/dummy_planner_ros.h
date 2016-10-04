@@ -51,15 +51,6 @@ namespace dummy_local_planner {
        */
       bool computeVelocityCommands(geometry_msgs::Twist& cmd_vel);
 
-
-      /**
-       * @brief  Given the current position, orientation, and velocity of the robot,
-       * compute velocity commands to send to the base, using dynamic window approach
-       * @param cmd_vel Will be filled with the velocity command to be passed to the robot base
-       * @return True if a valid trajectory was found, false otherwise
-       */
-      bool dummyComputeVelocityCommands(tf::Stamped<tf::Pose>& global_pose, geometry_msgs::Twist& cmd_vel);
-
       /**
        * @brief  Set the plan that the controller is following
        * @param orig_global_plan The plan to pass to the controller
