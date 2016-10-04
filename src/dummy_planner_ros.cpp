@@ -232,7 +232,7 @@ namespace dummy_local_planner {
     ROS_DEBUG_NAMED("dummy_local_planner", "Received a transformed plan with %zu points.", transformed_plan.size());
 
     // update plan in dummy_planner even if we just stop and rotate, to allow checkTrajectory
-    dp_->updatePlanAndLocalCosts(current_pose_, transformed_plan);
+    //dp_->updatePlanAndLocalCosts(current_pose_, transformed_plan);
 
     if (latchedStopRotateController_.isPositionReached(&planner_util_, current_pose_)) {
       //publish an empty plan because we've reached our goal position
@@ -241,16 +241,28 @@ namespace dummy_local_planner {
       publishGlobalPlan(transformed_plan);
       publishLocalPlan(local_plan);
       base_local_planner::LocalPlannerLimits limits = planner_util_.getCurrentLimits();
-      return latchedStopRotateController_.computeVelocityCommandsStopRotate(
-          cmd_vel,
-          limits.getAccLimits(),
-          dp_->getSimPeriod(),
-          &planner_util_,
-          odom_helper_,
-          current_pose_,
-          boost::bind(&DummyPlanner::checkTrajectory, dp_, _1, _2, _3));
+      return true;
+      //~ return latchedStopRotateController_.computeVelocityCommandsStopRotate(
+          //~ cmd_vel,
+          //~ limits.getAccLimits(),
+          //~ dp_->getSimPeriod(),
+          //~ &planner_util_,
+          //~ odom_helper_,
+          //~ current_pose_,
+          //~ boost::bind(&DummyPlanner::checkTrajectory, dp_, _1, _2, _3));
     } else {
-      bool isOk = dummyComputeVelocityCommands(current_pose_, cmd_vel);
+      //~ bool isOk = dummyComputeVelocityCommands(current_pose_, cmd_vel);
+      geometry_msgs::PoseStamped goal_pose = transformed_plan.back();
+      Eigen::Vector3f pos(current_pose_.getOrigin().getX(), current_pose_.getOrigin().getY(), tf::getYaw(current_pose_.getRotation()));
+      double angle_to_goal = atan2(goal_pose.pose.position.y - pos[1], goal_pose.pose.position.x - pos[0]);
+      if ( fabs(angle_to_goal) >= 0.001 ) {
+        cmd_vel.linear.x = 0.0;
+        cmd_vel.angular.z = 0.1 * sgn<double>(angle_to_goal);
+      } else {
+        cmd_vel.linear.x = 0;
+        cmd_vel.angular.z = 0;
+      }
+      bool isOk = true;
       if (isOk) {
         publishGlobalPlan(transformed_plan);
       } else {
