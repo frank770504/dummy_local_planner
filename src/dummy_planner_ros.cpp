@@ -166,7 +166,6 @@ namespace dummy_local_planner {
           current_pose_,
           boost::bind(&DummyPlannerROS::always_true, this, _1, _2, _3));
     } else {
-      //~ bool isOk = dummyComputeVelocityCommands(current_pose_, cmd_vel);
       geometry_msgs::PoseStamped goal_pose = transformed_plan.back();
       Eigen::Vector3f pos(current_pose_.getOrigin().getX(), current_pose_.getOrigin().getY(), tf::getYaw(current_pose_.getRotation()));
       double angle_to_goal = atan2(goal_pose.pose.position.y - pos[1], goal_pose.pose.position.x - pos[0]);
