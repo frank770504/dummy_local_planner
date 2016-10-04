@@ -113,6 +113,9 @@ namespace dummy_local_planner {
 
       base_local_planner::OdometryHelperRos odom_helper_;
       std::string odom_topic_;
+      template <typename T> int sgn(T val) {
+         return (T(0) < val) - (val < T(0));
+      }
   };  // end class DUMMYPlannerROS
 };  // end namespace dummy_local_planner
 
