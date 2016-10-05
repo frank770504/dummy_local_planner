@@ -27,6 +27,9 @@
 #include <nav_msgs/Path.h>
 
 namespace dummy_local_planner {
+  static double Deg2Rad(double th_d) {
+    return th_d * 3.1415926 / 180;
+  }
   /**
    * @class DummyPlanner
    * @brief A class implementing a local planner using the Dynamic Window Approach

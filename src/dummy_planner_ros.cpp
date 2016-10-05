@@ -166,17 +166,26 @@ namespace dummy_local_planner {
           current_pose_,
           boost::bind(&DummyPlannerROS::always_true, this, _1, _2, _3));
     } else {
+      // Add the custom local planner below //
+      // This dummy planner use a dummy way to do local planner
+      // it cannot do obstacle avoidance, but just global planner follower
+      // I seperate the process into two phase
+      // 1. turn until toward to the goal
+      // 2. go forward straight until arrining goal
+      double x_small_const_vel = 0.1;
+      double w_small_const_vel = 0.1;
       geometry_msgs::PoseStamped goal_pose = transformed_plan.back();
       Eigen::Vector3f pos(current_pose_.getOrigin().getX(), current_pose_.getOrigin().getY(), tf::getYaw(current_pose_.getRotation()));
       double angle_to_goal = atan2(goal_pose.pose.position.y - pos[1], goal_pose.pose.position.x - pos[0]);
-      if ( fabs(pos[2] - angle_to_goal) >= (5*3.14159/180.0) ) {
+      if ( fabs(pos[2] - angle_to_goal) >= dummy_local_planner::Deg2Rad(5.0) ) {
         cmd_vel.linear.x = 0.0;
-        cmd_vel.angular.z = 0.1 * sgn<double>(angle_to_goal - pos[2]);
+        cmd_vel.angular.z = w_small_const_vel * sgn<double>(angle_to_goal - pos[2]);
       } else {
-        cmd_vel.linear.x = 0.1;
+        cmd_vel.linear.x = x_small_const_vel;
         cmd_vel.angular.z = 0;
       }
       bool isOk = true;
+      // Add the custom local planner upper //
       if (isOk) {
         publishGlobalPlan(transformed_plan);
       } else {
