@@ -1,0 +1,131 @@
+window
+(
+  # GUI options
+  show_data 1
+  show_trailarrows 1
+  # show_trailrise 1
+  # show_trailfast 1
+)
+
+define hokuyolaser ranger
+(
+	sensor
+	(
+		# laser-specific properties
+		# factory settings for LMS200
+		range [ 0.0  10.0 ]
+		fov 180
+		samples 180
+		# noise [ 0.005 0.00 0.5 ]
+	)
+
+	# generic model properties
+	color "blue"
+	size [ 0.07 0.07 0.05 ] # dimensions from LMS200 data sheet
+)
+
+
+define pioneer3at position
+(
+	color "red"          # Default color.
+	drive "diff"         # Differential steering model.
+	gui_nose 1           # Draw a nose on the robot so we can see which way it points
+	obstacle_return 1    # Can hit things.
+	laser_return 1	            	# reflects sonar beams
+
+
+	# alternative odometric localization with simple error model
+	localization "odom"                 # Change to "gps" to have impossibly perfect, global odometry
+#	odom_error [ 0.05 0.05 0.1 0 ]      # Odometry error or slip in X, Y and Theta (Uniform random distribution)
+	odom_error [ 0 0 0 0 ]
+
+	# four DOF kinematics limits
+	# [ xmin xmax ymin ymax zmin zmax amin amax ]
+	velocity_bounds     [-0.75 0.75 0 0 0 0 -90.0 90.0 ]
+	acceleration_bounds [-0.5 0.5 0 0 0 0 -90.0 90.0 ]
+
+	# Actual size
+	# agv2
+	size [1.12 0.648 0.3]
+
+	#size [0.2 0.2 0.3]
+
+	# The pioneer's center of rotation is offset from its center of area
+	origin [0 0 0 0]
+
+	# Estimated mass in KG
+	mass 40.0
+
+	# Body shape:
+#	block
+#	(
+#		points 8
+#		point[0] [-0.18 0.313]
+#		point[1] [0.18 0.313]
+#		point[2] [0.2525 0.18]
+#		point[3] [0.2525 -0.18]
+#		point[4] [0.18 -0.313]
+#		point[5] [-0.18 -0.313]
+#		point[6] [-0.2525 -0.18]
+#		point[7] [-0.2525 0.18]
+#		z [0 1]
+#	)
+
+	hokuyolaser
+	(
+	  # ctrl "lasernoise"
+	  pose [0.57 0 0 0 ]
+	)
+)
+
+
+define floorplan model
+(
+	# sombre, sensible, artistic
+	color "gray30"
+
+	# most maps will need a bounding box
+	boundary 1
+
+	gui_nose 0
+	gui_grid 0
+	gui_move 0
+	gui_outline 0
+
+	gripper_return 0
+	fiducial_return 0
+	laser_return 1
+)
+
+
+
+
+name                    "Navigation-2D Tutorial"
+interval_sim            100
+quit_time                 0
+resolution                0.05
+show_clock                0
+show_clock_interval     100
+threads                 2
+
+# Load an environment bitmap
+floorplan
+(
+  name "dummy_planner_test"
+  bitmap "dummy_planner_test.png"
+  # Size in meters (the image has 4800x2400 pixels x 0.05 resolution in the .yaml)
+  size [10 10 1]
+  # Where to make the origin (rotate and offset) compal_7F_all origin1: [-25.624998, -25.624998, 0.000000]
+  pose [0 0 0 0]
+  #pose [−1.28 −1.28 0 0]
+  #pose [0 0 0 0]
+)
+
+# Put a single robot into the world
+pioneer3at
+(
+  name "agv2"
+  pose [0 0 0 0]
+)
+
+

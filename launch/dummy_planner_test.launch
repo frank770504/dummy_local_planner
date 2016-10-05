@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- CONFIG -->
+  <!-- run_rviz = {true, false} -->
+  <arg name="run_rviz" default="true"/>
+  <param name="use_sim_time" value="true" />
+
+	<!-- Start Stage simulator with a given environment -->
+	<node name="Stage" pkg="stage_ros" type="stageros" args="$(find dummy_local_planner)/test_data/dummy_planner_test.world">
+		<param name="base_watchdog_timeout" value="0" />
+	</node>
+
+  <!-- MAP SERVER -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find dummy_local_planner)/test_data/dummy_planner_test.yaml  _frame_id:=map" output="screen">
+<!--
+    <remap from="map" to="global_map"/>
+-->
+  </node>
+  <node pkg="tf" type="static_transform_publisher" name="tf_odom_broadcaster" args="0 0 0 0 0 0 map odom 50"/>
+  <!-- MOVE CONTROL -->
+  <include file="$(find move_base)/launch/move_base.launch">
+    <arg name="base_global_planner" value="global_planner/GlobalPlanner"/>
+    <arg name="base_local_planner"      value="dummy_local_planner/DummyPlannerROS"/>
+    <arg name="controller_frequency"      value="2.0" />
+    <arg name="planner_frequency"         value="0.0" />
+    <arg name="recovery_behavior_enabled" value="false" />
+    <arg name="clearing_rotation_allowed" value="false" />
+  </include>
+
+
+  <!-- RVIZ -->
+  <node pkg="rviz" type="rviz" name="rviz" output="screen" args="-d $(find dummy_local_planner)/test_data/dummy_planner_test.rviz" if="$(arg run_rviz)">
+    <remap from="scan" to="base_scan"/>
+  </node>
+
+  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" output="screen"/>
+  <!--<node pkg="rqt_gui" type="rqt_gui" name="rqt_gui" output="screen"/>-->
+
+</launch>

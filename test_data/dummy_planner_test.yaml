@@ -1,0 +1,10 @@
+#image1: map_tim2.pgm
+#image1: map_elevator2.pgm
+#image1: compal_7F_outside.pgm
+image1: dummy_planner_test.pgm
+resolution: 0.050000
+
+origin1: [-5.25, -5.25, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
